@@ -19,25 +19,8 @@ import re
 import datetime
 from urllib.parse import urlparse
 
-# ─────────────────────────────────────────────────────────────
-# DEPENDENCY CHECK & INSTALL
-# ─────────────────────────────────────────────────────────────
-def install_if_missing(package, import_name=None):
-    import importlib
-    name = import_name or package
-    try:
-        importlib.import_module(name)
-    except ImportError:
-        import subprocess
-        print(f"[*] Installing {package}...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package, "-q"])
-
-install_if_missing("requests")
-install_if_missing("dnspython", "dns")
-install_if_missing("colorama")
-install_if_missing("tabulate")
-install_if_missing("whois", "whois")
-
+# Dependencies are installed explicitly from requirements.txt; never modify
+# the user's Python environment automatically at runtime.
 import requests
 import dns.resolver
 import dns.reversename
@@ -65,10 +48,24 @@ def print_banner():
 # UTILITY HELPERS
 # ─────────────────────────────────────────────────────────────
 def normalize_url(target: str) -> str:
-    """Ensure URL has a scheme."""
-    if not target.startswith(("http://", "https://")):
-        target = "https://" + target
-    return target.rstrip("/")
+    """Normalize an HTTP(S) URL and reject ambiguous or credential-bearing input."""
+    if not isinstance(target, str) or not target.strip() or len(target) > 2048:
+        raise ValueError("Enter a valid HTTP or HTTPS URL.")
+    value = target.strip()
+    if "://" not in value:
+        value = "https://" + value
+    parsed = urlparse(value)
+    if parsed.scheme.lower() not in ("http", "https"):
+        raise ValueError("Only HTTP and HTTPS URLs are supported.")
+    if not parsed.hostname or parsed.username is not None or parsed.password is not None:
+        raise ValueError("URL must include a hostname and must not contain credentials.")
+    try:
+        parsed.port
+    except ValueError as exc:
+        raise ValueError("URL contains an invalid port.") from exc
+    if any(ord(ch) < 32 for ch in value):
+        raise ValueError("URL contains invalid control characters.")
+    return value.rstrip("/")
 
 
 def extract_hostname(url: str) -> str:
@@ -134,7 +131,7 @@ def get_http_headers(url: str) -> dict:
     """
     result = {"headers": {}, "status_code": None, "redirect_chain": []}
     try:
-        resp = requests.get(url, timeout=10, allow_redirects=True,
+        resp = requests.get(url, timeout=(3, 10), allow_redirects=False,
                             headers={"User-Agent": "WebScanner/1.0"})
         result["status_code"] = resp.status_code
         result["headers"] = dict(resp.headers)
