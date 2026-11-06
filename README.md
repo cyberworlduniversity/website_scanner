@@ -548,3 +548,55 @@ website_scanner/
 ---
 
 *Built for educational purposes as part of the Security & Recon Toolkit.*
+
+
+## Repository Quick Start
+
+Clone this repository and enter its directory:
+
+```bash
+git clone https://github.com/cyberworlduniversity/website_scanner.git
+cd website_scanner
+```
+
+### Requirements and installation
+
+- Python 3.10+ is recommended.
+- Create an isolated environment and install the pinned project dependencies:
+
+```bash
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+### Run
+
+```bash
+python website_scanner.py
+```
+
+If the program presents command-line options, run `python website_scanner.py --help` to view the options supported by the current version. Use a test target or sample input first.
+
+### Validate the source
+
+```bash
+python -m compileall -q .
+```
+
+Scan only websites you own or are explicitly authorized to assess.
+
+### Program flow
+
+```mermaid
+flowchart TD
+    A[Start] --> B[Load configuration and input]
+    B --> C{Input valid?}
+    C -- No --> D[Show usage or validation error]
+    C -- Yes --> E[Run website scanner analysis]
+    E --> F[Collect findings]
+    F --> G[Display or save results]
+    G --> H[Exit]
+    D --> H
+```
