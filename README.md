@@ -1,5 +1,15 @@
 # 🌍 Website Information Scanner
 
+
+## Get this repository
+
+Clone the current project (this repository's canonical GitHub URL), then follow the installation and usage steps below.
+
+```bash
+git clone https://github.com/cyberworlduniversity/website_scanner.git
+cd website_scanner
+```
+
 > **Tool #9** — Security & Recon Toolkit  
 > *Collects information about a website including IP address, server type, HTTP headers, DNS records, SSL certificates, WHOIS data, and security header audits.*
 
@@ -65,7 +75,7 @@ The **Website Information Scanner** is a passive reconnaissance tool that gather
 
 ```bash
 # Clone or download the project
-git clone https://github.com/yourusername/website-scanner
+git clone https://github.com/cyberworlduniversity/website_scanner.git
 cd website_scanner
 
 # Install dependencies
